@@ -9,5 +9,10 @@ project(MultiArmSim
 
 message("Start Building")
 
-add_executable(${PROJECT_NAME} src/main.cpp )
+add_executable(${PROJECT_NAME}  src/main.cpp 
+                                src/Agent.cpp
+                                src/Arm.cpp 
+                                src/reward/RewardModel.cpp 
+                                src/reward/GaussianRewardModel.cpp
+                                src/reward/StaticRewardModel.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
