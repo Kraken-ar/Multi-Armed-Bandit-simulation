@@ -1,5 +1,4 @@
 #include "Agent.hpp"
-#include <random>
 Agent::Agent(double epslon, double alpha) : epslon(epslon), alpha(alpha)
 {
   
@@ -24,14 +23,14 @@ void Agent::initializeArmsData(int numberOfArms)
 
 double Agent::generateRandomNumber(double min, double max)
 {
-    std::random_device rd;
+   
     std::mt19937 gen(rd());
     std::uniform_real_distribution<> dis(min, max);
     return dis(gen);
 }
 int Agent::generateRandomArmId()
 {
-    std::random_device rd;
+   
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> dis(0, armsData.size() - 1);
     return dis(gen);

@@ -4,6 +4,7 @@
 Enviroment::Enviroment(Agent* agent, std::vector<Arm*> arms) : agent(agent), arms(arms)
 {
     this->agent->initializeArmsData(arms.size());
+    this->rewardHistoryTracker = new RewardHistoryTracker("reward_history.csv");
 }
 
 Enviroment::~Enviroment()
@@ -18,6 +19,8 @@ void Enviroment::fit(int it){
         armId = agent->makeAction();
         reward = arms.at(armId)->getReward();
         agent->updateArmData(armId,reward);
+        rewardHistoryTracker->addReward(i,armId,reward);
         std::cout << "--- [Iteration: " << i << "] ArmId: " << armId << " Reward: " << reward << std::endl;
     }
+    rewardHistoryTracker->saveToFile();
 }

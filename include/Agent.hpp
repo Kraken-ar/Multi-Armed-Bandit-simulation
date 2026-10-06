@@ -1,4 +1,6 @@
 #include <vector>
+#include <random>
+
 #pragma once
 using ArmId = std::size_t;
 
@@ -16,6 +18,7 @@ class Agent
 private:
     double epslon;
     double alpha;
+    std::random_device rd;
    
     std::vector<ArmData> armsData;
 

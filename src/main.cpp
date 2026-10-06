@@ -21,7 +21,7 @@ int main(int argc, char const *argv[])
 
     Enviroment* env = new Enviroment(agent,arms);
 
-    env->fit(1000);
+    env->fit(10);
     
    
    

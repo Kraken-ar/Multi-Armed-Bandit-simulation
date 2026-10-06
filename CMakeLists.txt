@@ -15,5 +15,6 @@ add_executable(${PROJECT_NAME}  src/main.cpp
                                 src/Enviroment.cpp 
                                 src/reward/RewardModel.cpp 
                                 src/reward/GaussianRewardModel.cpp
-                                src/reward/StaticRewardModel.cpp)
+                                src/reward/StaticRewardModel.cpp
+                                src/history/RewardHistoryTracker.cpp)
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
