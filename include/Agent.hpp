@@ -32,6 +32,7 @@ public:
     void updateArmData(ArmId armId, double reward);
     double generateRandomNumber(double min = 0.0, double max = 1.0);
     int generateRandomArmId();
-
+    std::vector<double> getArmsEstimatedValues();
+   
     
 };

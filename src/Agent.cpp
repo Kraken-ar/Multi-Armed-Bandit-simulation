@@ -63,3 +63,13 @@ void Agent::updateArmData(ArmId armId, double reward)
 
     
 }
+std::vector<double> Agent::getArmsEstimatedValues()
+ {
+        std::vector<double> estimatedValues;
+        for (const auto& arm : armsData)
+        {
+            estimatedValues.push_back(arm.lastEstimatedValue);
+        }
+        return estimatedValues;
+    }
+
