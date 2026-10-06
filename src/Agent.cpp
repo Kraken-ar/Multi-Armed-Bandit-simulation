@@ -1,8 +1,8 @@
 #include "Agent.hpp"
 #include <random>
-Agent::Agent(double epslon, double alpha,int numberOfArms) : epslon(epslon), alpha(alpha)
+Agent::Agent(double epslon, double alpha) : epslon(epslon), alpha(alpha)
 {
-    this->initializeArmsData(numberOfArms);
+  
 }
 
 
@@ -42,7 +42,14 @@ ArmId Agent::makeAction()
     {
        return generateRandomArmId(); 
     }
-
+    ArmId BiggestRewardArmId = 0;
+    for(ArmId i = 1; i < armsData.size(); i++)
+    {
+        if (armsData.at(i).lastEstimatedValue > armsData.at(BiggestRewardArmId).lastEstimatedValue)
+        {
+            BiggestRewardArmId = i;
+        }
+    }
     return BiggestRewardArmId;
     
 }
@@ -50,15 +57,10 @@ ArmId Agent::makeAction()
 
 void Agent::updateArmData(ArmId armId, double reward)
 {
-    ArmData& arm = armsData[armId];
+    ArmData& arm = armsData.at(armId);
 
     arm.timesPlayed++;
     arm.lastEstimatedValue = arm.lastEstimatedValue + (alpha*(reward - arm.lastEstimatedValue));
 
-    if (reward > armsData[BiggestRewardArmId].lastEstimatedValue)
-    {
-        BiggestRewardArmId = armId;
-    }
-    
     
 }

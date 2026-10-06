@@ -1,6 +1,8 @@
 #include "reward/StaticRewardModel.hpp"
 #include <random>
 
+
+
 StaticRewardModel::StaticRewardModel(double rewardValue) : rewardValue(rewardValue)
 {
 }

@@ -1,4 +1,7 @@
 #include "reward/RewardModel.hpp"
+#pragma once
+
+
 class Arm
 {
 private:

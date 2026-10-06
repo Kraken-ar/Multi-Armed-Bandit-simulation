@@ -11,7 +11,8 @@ message("Start Building")
 
 add_executable(${PROJECT_NAME}  src/main.cpp 
                                 src/Agent.cpp
-                                src/Arm.cpp 
+                                src/Arm.cpp
+                                src/Enviroment.cpp 
                                 src/reward/RewardModel.cpp 
                                 src/reward/GaussianRewardModel.cpp
                                 src/reward/StaticRewardModel.cpp)

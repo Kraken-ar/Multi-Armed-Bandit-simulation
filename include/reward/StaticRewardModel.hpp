@@ -1,4 +1,8 @@
 #include "RewardModel.hpp"
+
+#pragma once
+
+
 class StaticRewardModel : public RewardModel
 {
 private:

@@ -1,5 +1,5 @@
 #include <vector>
-
+#pragma once
 using ArmId = std::size_t;
 
 using ArmData = struct ArmData
@@ -16,11 +16,11 @@ class Agent
 private:
     double epslon;
     double alpha;
-    ArmId BiggestRewardArmId = 0;
+   
     std::vector<ArmData> armsData;
 
 public:
-    Agent(double epslon, double alpha,int numberOfArms);
+    Agent(double epslon, double alpha);
   
     ~Agent();
 
