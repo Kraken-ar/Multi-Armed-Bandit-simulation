@@ -9,6 +9,8 @@ project(MultiArmSim
 
 message("Start Building")
 
+
+
 add_executable(${PROJECT_NAME}  src/main.cpp 
                                 src/Agent.cpp
                                 src/Arm.cpp
@@ -22,6 +24,15 @@ add_executable(${PROJECT_NAME}  src/main.cpp
                                )
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-add_subdirectory(lib/matplotplusplus)
 
-target_link_libraries(${PROJECT_NAME} PUBLIC matplot)
+include(FetchContent)
+
+FetchContent_Declare(
+    matplotplusplus
+    GIT_REPOSITORY https://github.com/alandefreitas/matplotplusplus.git
+   
+)
+
+FetchContent_MakeAvailable(matplotplusplus)
+
+target_link_libraries(${PROJECT_NAME} PUBLIC Matplot++::matplot)
