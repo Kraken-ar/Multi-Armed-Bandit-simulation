@@ -10,10 +10,10 @@ int main(int argc, char const *argv[])
 {
    
     vector<Arm*> arms = {
-      new Arm(new StaticRewardModel(0,true,true,0,0.1)),
-       new Arm( new StaticRewardModel(0,true,true,0,0.1)),
-       new Arm( new StaticRewardModel(0,true,true,-3,2)),
-       new Arm( new StaticRewardModel(0,true,true,0,0.1)),
+      new Arm(new StaticRewardModel(5,true,true,0,0.1)),
+       new Arm( new StaticRewardModel(10,true,true,0,0.1)),
+       new Arm( new StaticRewardModel(20,true,true,0,0.1)),
+       new Arm( new StaticRewardModel(7,true,true,0,0.1)),
        new Arm( new StaticRewardModel(0,true,true,0,0.1)),
     };
    

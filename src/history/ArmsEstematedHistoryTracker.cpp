@@ -2,16 +2,17 @@
 
 
 
-ArmsEstematedHistoryTracker::ArmsEstematedHistoryTracker(int numberOfArms, const std::string& filename): numberOfArms(numberOfArms)
+ArmsEstematedHistoryTracker::ArmsEstematedHistoryTracker(int numberOfArms): numberOfArms(numberOfArms)
 {
-    this->inisialize(numberOfArms, filename);
+    this->inisializeHistoryContainer(numberOfArms);
+    linePlotter = new LinePlotter();
 }
 
 ArmsEstematedHistoryTracker::~ArmsEstematedHistoryTracker()
 {
 }
 
-void ArmsEstematedHistoryTracker::inisialize(int numberOfArms, const std::string& filename){
+void ArmsEstematedHistoryTracker::inisializeFile( const std::string& filename){
     this->file = new std::ofstream(filename);
     *file<<"Step";
     for (int i = 0; i < numberOfArms; i++)
@@ -22,16 +23,41 @@ void ArmsEstematedHistoryTracker::inisialize(int numberOfArms, const std::string
     
 }
 
-void ArmsEstematedHistoryTracker::addArmsEstemated(int step, std::vector<double> armsData){
-    *file << step;
+void ArmsEstematedHistoryTracker::inisializeHistoryContainer(int numberOfArms){
+    this->armsEstematedHistory = new ArmsEstematedHistory();
+    for (int i = 0; i < numberOfArms; i++)
+    {
+        armsEstematedHistory->push_back(std::vector<double>());
+    }
+}
+
+void ArmsEstematedHistoryTracker::addArmsEstemated(std::vector<double> armsData){
+    
+
+    for(int i = 0; i<armsEstematedHistory->size();i++){
+        armsEstematedHistory->at(i).push_back(armsData.at(i));
+    }
+}
+
+void ArmsEstematedHistoryTracker::copyHistoryToFile(){
+    for (int step = 0;step < armsEstematedHistory->at(0).size();step++){
+        *file << step;
     for (int i = 0; i < numberOfArms ; i++)
     {
-        *file << "," << armsData.at(i);
+        *file << "," << armsEstematedHistory->at(i).at(step);
     }
     *file << "\n";
+    }
 }
 
 
-void ArmsEstematedHistoryTracker::saveFile(){
+
+void ArmsEstematedHistoryTracker::saveFile(const std::string& filename){
+    this->inisializeFile(filename);
+    this->copyHistoryToFile();
     file->close();
+}
+
+void ArmsEstematedHistoryTracker::drawLinePlot(){
+    this->linePlotter->draw(*armsEstematedHistory,"Arms Estemation History","step","Estemation");
 }

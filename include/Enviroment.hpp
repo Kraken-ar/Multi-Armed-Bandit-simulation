@@ -3,7 +3,12 @@
 #include "Arm.hpp"
 #include "history/RewardHistoryTracker.hpp"
 #include "history/ArmsEstematedHistoryTracker.hpp"
+
 #include <vector>
+
+
+
+
 class Enviroment
 {
 private:
@@ -11,6 +16,10 @@ private:
     std::vector<Arm*> arms;
     RewardHistoryTracker* rewardHistoryTracker;
     ArmsEstematedHistoryTracker* armsEstematedHistoryTracker;
+    
+    
+
+
 
 
 public:
