@@ -12,7 +12,7 @@ RewardHistoryTracker::~RewardHistoryTracker()
 }
 
 void RewardHistoryTracker::inisializeFile(const std::string& filename){
-    file = new std::ofstream(filename);
+    file = new std::ofstream("./results/"+filename);
     *file << "Step,SelectedArm,Reward\n";
 
 }

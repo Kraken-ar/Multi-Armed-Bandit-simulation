@@ -1,4 +1,4 @@
-
+#pragma once
 #include "Agent.hpp"
 #include "Arm.hpp"
 #include "history/RewardHistoryTracker.hpp"
@@ -25,6 +25,7 @@ private:
 public:
     Enviroment(Agent* agent, std::vector<Arm*> arms);
     ~Enviroment();
+    void setAgent(Agent* agent);
     void fit(int it);
 };
 

@@ -18,6 +18,11 @@ Enviroment::~Enviroment()
    
 }
 
+void Enviroment::setAgent(Agent* agent)
+{
+    this->agent = agent;
+    this->agent->initializeArmsData(arms.size());
+}
 
 void Enviroment::fit(int it){
     ArmId armId; 

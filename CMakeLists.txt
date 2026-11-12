@@ -9,7 +9,10 @@ project(MultiArmSim
 
 message("Start Building")
 
-
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY
+    ${CMAKE_BINARY_DIR}/bin
+)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin/results)
 
 add_executable(${PROJECT_NAME}  src/main.cpp 
                                 src/Agent.cpp
@@ -21,9 +24,17 @@ add_executable(${PROJECT_NAME}  src/main.cpp
                                 src/history/RewardHistoryTracker.cpp
                                 src/history/ArmsEstematedHistoryTracker.cpp
                                 src/plotting/LinePlotter.cpp
+                                src/config/ConfigReader.cpp
+                                src/SimulationBuilder.cpp
                                )
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+
+set(RAPIDJSON_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/lib/rapidjson)
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include 
+                                                ${RAPIDJSON_INCLUDE_DIR})
+
+target_include_directories(${PROJECT_NAME} PRIVATE ${RAPIDJSON_INCLUDE_DIR})
 
 include(FetchContent)
 
