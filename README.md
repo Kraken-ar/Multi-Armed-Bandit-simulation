@@ -115,4 +115,4 @@ Both histories are also plotted in a window.
 
 ## License
 
-No license file is included yet. Add one before distributing or reusing this code.
+Use it however you like , just don't forget to credit me, or my ghost will haunt your codebase.
