@@ -4,7 +4,7 @@ A small, object-oriented C++ simulator for the **multi-armed bandit** problem. I
 environment of configurable arms, lets an agent explore/exploit them for a number of steps,
 tracks the rewards and the agent's value estimates, writes them to CSV, and plots them.
 
-Everything (epsilon, learning rate, arm reward distributions, number of steps, ...) is driven
+Everything (epsilon, learning rate, arm reward distributions, number of steps, output paths, ...) is driven
 by a JSON configuration file, so experiments can be changed without recompiling.
 
 > **Status:** early-stage research/learning project. The core simulation works; the roadmap at
@@ -20,9 +20,11 @@ by a JSON configuration file, so experiments can be changed without recompiling.
   - `static` arms — fixed reward, optionally with Gaussian noise and a drifting (random-walk) reward.
   - `gaussian` arms — reward sampled from `N(mean, std)` on every pull.
 - **Policy/agent hyper-parameters** from config: `epsilon` and `alpha`.
+- **Configurable run length and outputs** — `steps`, the results directory, and both history
+  file names come from the config; the directory is created automatically.
 - **History tracking**:
-  - reward + selected arm per step → `results/rewardHistory.csv`
-  - estimated value of every arm per step → `results/EstematedArmsHistory`
+  - reward + selected arm per step → `<output.directory>/<output.rewardHistoryFile>`
+  - estimated value of every arm per step → `<output.directory>/<output.armsEstimateHistoryFile>`
 - **Line plots** of the reward history and of all arms' value estimates (Matplot++).
 - **Layered design** (reward models, agent, environment, tracking, plotting, config parsing)
   that is meant to be extended with new algorithms and reward types.
@@ -75,7 +77,7 @@ Multi-Armed-Bandits-Simulation/
         ▼                              ▼
 ┌───────────────┐             ┌────────────────┐
 │     Agent     │◀────────────│   Enviroment   │
-│ eps-greedy Q  │   action    │  fit(steps)    │
+│ eps-greedy Q  │   action    │     fit()      │
 └───────────────┘   /reward  └───────┬────────┘
                                     │ pulls
                           ┌─────────▼─────────┐
@@ -95,7 +97,7 @@ Enviroment also owns:
 
 ### Simulation loop
 
-`Enviroment::fit(n)` repeats `n` times:
+`Enviroment::fit()` repeats `steps` times, where `steps` comes from the config:
 
 1. `Agent::makeAction()` — with probability `epsilon` pick a random arm, otherwise pick the arm
    with the highest estimated value (ties go to the lowest arm id).
@@ -104,7 +106,7 @@ Enviroment also owns:
    `Q(arm) ← Q(arm) + alpha * (reward − Q(arm))` and increment the pull count.
 4. Record the `(step, selected arm, reward)` and the current estimate of every arm.
 
-After the loop the history is written to `results/` and both plots are shown.
+After the loop the history is written to the configured output directory and both plots are shown.
 
 ---
 
@@ -144,8 +146,8 @@ cmake --build build
 MultiArmSim <config_file_path>
 ```
 
-Run it from the **project root** (or from `build/`) so the relative `./results/` output
-directory exists.
+Relative output paths are resolved from the current working directory, and the output directory
+is created automatically if it does not exist.
 
 ```powershell
 # Windows example
@@ -162,6 +164,11 @@ directory exists.
   "epsilon": 0.1,
   "alpha": 0.1,
   "steps": 10000,
+  "output": {
+    "directory": "results",
+    "rewardHistoryFile": "rewardHistory.csv",
+    "armsEstimateHistoryFile": "armsEstimatedHistory.csv"
+  },
   "arms": [
     { "type": "static", "value": 5.0 },
     { "type": "static", "value": 10.0, "drift": { "mean": 0.0, "std": 0.1 } },
@@ -177,7 +184,11 @@ directory exists.
 | --- | --- | --- | --- |
 | `epsilon` | double | yes | Exploration probability, `0.0` = pure greedy, `1.0` = pure random. Write it as a decimal (`0.1`, not `0`); the validator uses RapidJSON's `IsDouble()`. |
 | `alpha` | double | yes | Step size of the value update. `0 < alpha ≤ 1`; `1.0` means "use the last reward only". |
-| `steps` | int | yes | Validated and stored, but **currently ignored**: `main.cpp` hard-codes `fit(10000)`. |
+| `steps` | int | yes | Number of simulation iterations. |
+| `output` | object | no | Output directory and file names. All keys are optional and fall back to the defaults below. |
+| `output.directory` | string | no | Directory for generated history files (default `results`). Created if missing. |
+| `output.rewardHistoryFile` | string | no | Reward history file name (default `rewardHistory.csv`). |
+| `output.armsEstimateHistoryFile` | string | no | Arms estimate history file name (default `armsEstimatedHistory.csv`). |
 | `arms` | array | yes | At least one arm. |
 | `arms[].type` | string | yes | `"static"` or `"gaussian"`. Unknown values are treated as `"gaussian"`. |
 | `arms[].value` | number | static only | Base reward of a static arm. |
@@ -200,10 +211,12 @@ Notes on static arms:
 
 ## Outputs
 
+With the default `output` configuration, files are written to `results/`:
+
 | Path | Content |
 | --- | --- |
 | `results/rewardHistory.csv` | `Step,SelectedArm,Reward` — one row per step. |
-| `results/EstematedArmsHistory` | `Step,Q_0,...,Q_n` — value estimate of each arm per step (CSV, no extension). |
+| `results/armsEstimatedHistory.csv` | `Step,Q_0,...,Q_n` — value estimate of each arm per step. |
 | Plot window 1 | Reward history line plot. |
 | Plot window 2 | One line per arm: its estimated value over time. |
 
@@ -213,7 +226,7 @@ Open the CSVs with any spreadsheet tool, pandas, etc.:
 import pandas as pd
 
 rewards = pd.read_csv("results/rewardHistory.csv")
-estimates = pd.read_csv("results/EstematedArmsHistory")
+estimates = pd.read_csv("results/armsEstimatedHistory.csv")
 print(rewards["Reward"].mean())
 print(rewards["SelectedArm"].value_counts())
 ```
@@ -236,11 +249,7 @@ print(rewards["SelectedArm"].value_counts())
 - The action-selection policy is **hard-coded** to epsilon-greedy inside `Agent`.
 - Only the last estimate per arm is exposed; UCB/gradient methods will need pull counts,
   reward baselines, and per-arm preference values.
-- `steps` from the config is not used by `main.cpp`.
-- The image-export flags declared in `EnviromentConfig`
-  (`exportRewardHistoryPlotToImage`, `exportArmsEstimatedHistoryPlotToImage`) are not parsed or
-  implemented yet.
-- History file names/paths are hard-coded in `Enviroment::fit`.
+- Plots are only displayed; there is no image-export option yet.
 - Raw owning pointers are used throughout; `Enviroment::~Enviroment` mixes `free()` with
   `new`-allocated objects. Converting to `std::unique_ptr` / value semantics is advisable.
 - `std::random_device` is used to seed a fresh generator on every sample, so runs are not
@@ -253,9 +262,8 @@ print(rewards["SelectedArm"].value_counts())
 
 ### 1. Export plots as image files
 
-- [ ] Parse and honour the existing `exportRewardHistoryPlotToImage` and
-      `exportArmsEstimatedHistoryPlotToImage` config flags.
-- [ ] Add image format/path options (`png`, `svg`, `pdf`) and a configurable output directory.
+- [ ] Add image-export options to the `output` config section.
+- [ ] Support `png`, `svg`, and `pdf` formats and use `output.directory` for the image paths.
 - [ ] Use Matplot++'s `save()` instead of (or in addition to) `show()`, e.g.
       `matplot::save("results/reward_history.png")`, and optionally run headless (`show()` off)
       so the simulator can run on CI/servers without a display.
@@ -280,11 +288,10 @@ print(rewards["SelectedArm"].value_counts())
 
 ### 3. Simulation correctness & reproducibility
 
-- [ ] Use the `steps` value from the config instead of hard-coded `fit(10000)`.
 - [ ] Add a `seed` option and keep one seeded PRNG per simulation for reproducible runs.
 - [ ] Report cumulative reward, average reward and regret against the best arm.
 - [ ] Support repeated runs and plot means with confidence bands.
-- [ ] Emit results next to the config/executable rather than the hard-coded `./results/`.
+- [ ] Resolve relative output paths against the config file location.
 
 ### 4. Code quality
 
