@@ -174,6 +174,39 @@ std::vector<ArmConfig> ConfigReader::parseArmsConfig(const rapidjson::Value &arm
     return armsConfig;
 }
 
+OutputPaths ConfigReader::parseOutputPaths()
+{
+    OutputPaths outputPaths;
+
+    if (!hasValue(document, "output"))
+    {
+        return outputPaths;
+    }
+
+    this->throwErrorIfMissingOrInvalid(document, "output", ValidationType::OBJECT);
+    const rapidjson::Value& output = document["output"];
+
+    if (hasValue(output, "directory"))
+    {
+        this->throwErrorIfMissingOrInvalid(output, "directory", ValidationType::STRING);
+        outputPaths.directory = output["directory"].GetString();
+    }
+
+    if (hasValue(output, "rewardHistoryFile"))
+    {
+        this->throwErrorIfMissingOrInvalid(output, "rewardHistoryFile", ValidationType::STRING);
+        outputPaths.rewardHistoryFile = output["rewardHistoryFile"].GetString();
+    }
+
+    if (hasValue(output, "armsEstimateHistoryFile"))
+    {
+        this->throwErrorIfMissingOrInvalid(output, "armsEstimateHistoryFile", ValidationType::STRING);
+        outputPaths.armsEstimateHistoryFile = output["armsEstimateHistoryFile"].GetString();
+    }
+
+    return outputPaths;
+}
+
 EnviromentConfig ConfigReader::parseEnviromentConfig()
 {
     
@@ -189,7 +222,8 @@ EnviromentConfig ConfigReader::parseEnviromentConfig()
 
 
     EnviromentConfig enviromentConfig;
-    int steps = document["steps"].GetInt();
+    enviromentConfig.steps = document["steps"].GetInt();
+    enviromentConfig.outputPaths = parseOutputPaths();
     enviromentConfig.armsConfig = parseArmsConfig(armsArray);
 
     return enviromentConfig;
@@ -221,7 +255,7 @@ Enviroment* ConfigReader::getEnviroment()
     }
 
     Agent* agent = getAgent();
-    Enviroment* enviroment = new Enviroment(agent, arms);
+    Enviroment* enviroment = new Enviroment(agent, arms, enviromentConfig.steps, enviromentConfig.outputPaths);
     return enviroment;
 }
 

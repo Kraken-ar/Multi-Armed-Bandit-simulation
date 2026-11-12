@@ -1,21 +1,19 @@
 #include "Enviroment.hpp"
-#include <iostream>
 
-Enviroment::Enviroment(Agent* agent, std::vector<Arm*> arms) : agent(agent), arms(arms)
+#include <filesystem>
+
+Enviroment::Enviroment(Agent* agent, std::vector<Arm*> arms, int steps, const OutputPaths& outputPaths)
+    : agent(agent), arms(arms), steps(steps), outputPaths(outputPaths)
 {
     this->agent->initializeArmsData(arms.size());
     this->rewardHistoryTracker = new RewardHistoryTracker();
     this->armsEstematedHistoryTracker = new ArmsEstematedHistoryTracker(arms.size());
-   
-
-    
 }
 
 Enviroment::~Enviroment()
 {
     free(rewardHistoryTracker);
     free(armsEstematedHistoryTracker);
-   
 }
 
 void Enviroment::setAgent(Agent* agent)
@@ -24,28 +22,29 @@ void Enviroment::setAgent(Agent* agent)
     this->agent->initializeArmsData(arms.size());
 }
 
-void Enviroment::fit(int it){
-    ArmId armId; 
+void Enviroment::fit()
+{
+    std::filesystem::create_directories(outputPaths.directory);
+
+    ArmId armId;
     double reward;
     std::vector<double> armsEstimatedValues;
-    for (int i = 0;i<it;i++){
+
+    for (int step = 0; step < steps; step++)
+    {
         armId = agent->makeAction();
         reward = arms.at(armId)->getReward();
-       
-        agent->updateArmData(armId,reward);
-       
-        rewardHistoryTracker->addReward(armId,reward);
+
+        agent->updateArmData(armId, reward);
+
+        rewardHistoryTracker->addReward(armId, reward);
         armsEstimatedValues = agent->getArmsEstimatedValues();
         armsEstematedHistoryTracker->addArmsEstemated(armsEstimatedValues);
-      
-     
-        // std::cout << "--- [Iteration: " << i << "] ArmId: " << armId << " Reward: " << reward << std::endl;
     }
-    
-    rewardHistoryTracker->saveToFile("rewardHistory.csv");
-    armsEstematedHistoryTracker->saveFile("EstematedArmsHistory");
+
+    const std::filesystem::path directory = outputPaths.directory;
+    rewardHistoryTracker->saveToFile((directory / outputPaths.rewardHistoryFile).string());
+    armsEstematedHistoryTracker->saveFile((directory / outputPaths.armsEstimateHistoryFile).string());
     rewardHistoryTracker->drawLinePlot();
     armsEstematedHistoryTracker->drawLinePlot();
-    
-    
 }

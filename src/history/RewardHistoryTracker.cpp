@@ -1,5 +1,7 @@
 #include "history/RewardHistoryTracker.hpp"
 
+#include <stdexcept>
+
 
 RewardHistoryTracker::RewardHistoryTracker()
 {
@@ -12,9 +14,14 @@ RewardHistoryTracker::~RewardHistoryTracker()
 }
 
 void RewardHistoryTracker::inisializeFile(const std::string& filename){
-    file = new std::ofstream("./results/"+filename);
-    *file << "Step,SelectedArm,Reward\n";
+    file = new std::ofstream(filename);
 
+    if (!file->is_open())
+    {
+        throw std::runtime_error("Failed to open output file: " + filename);
+    }
+
+    *file << "Step,SelectedArm,Reward\n";
 }
 
 

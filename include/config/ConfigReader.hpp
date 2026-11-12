@@ -49,16 +49,9 @@ struct ArmConfig
 
 using EnviromentConfig = struct EnviromentConfig
 {
-    
+    int steps;
+    OutputPaths outputPaths;
     std::vector<ArmConfig> armsConfig;
-    bool exportRewardHistoryToFile;
-    bool exportArmsEstimatedHistoryToFile;
-    bool drawRewardHistoryPlot;
-    bool drawArmsEstimatedHistoryPlot;
-    bool exportRewardHistoryPlotToImage;
-    bool exportArmsEstimatedHistoryPlotToImage;
-
-
 };
 
 class ConfigReader
@@ -73,8 +66,8 @@ private:
     bool validateValueType(const rapidjson::Value& value, const std::string& key, ValidationType expectedType);
     AgentConfig parseAgentConfig();
     EnviromentConfig parseEnviromentConfig();
+    OutputPaths parseOutputPaths();
     std::vector<ArmConfig> parseArmsConfig(const rapidjson::Value& armsArray);
-    std::vector<ArmConfig> parseArmConfig(const rapidjson::Value& arm);
     bool existsAndValid(const rapidjson::Value& value, const std::string& key, ValidationType expectedType);
     // bool throwErrorIfexistsAndValid(const rapidjson::Value& value, const std::string& key, ValidationType expectedType);
     void throwErrorIfMissingOrInvalid(const rapidjson::Value& value, const std::string& key, ValidationType expectedType);

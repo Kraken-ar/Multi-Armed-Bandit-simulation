@@ -1,5 +1,7 @@
 #include "history/ArmsEstematedHistoryTracker.hpp"
 
+#include <stdexcept>
+
 
 
 ArmsEstematedHistoryTracker::ArmsEstematedHistoryTracker(int numberOfArms): numberOfArms(numberOfArms)
@@ -15,13 +17,10 @@ ArmsEstematedHistoryTracker::~ArmsEstematedHistoryTracker()
 void ArmsEstematedHistoryTracker::inisializeFile( const std::string& filename){
     this->file = new std::ofstream(filename);
 
-std::cout << "Filename: " << filename << '\n';
+    if (!this->file->is_open()) {
+        throw std::runtime_error("Failed to open output file: " + filename);
+    }
 
-if (!this->file->is_open()) {
-    std::cerr << "FAILED TO OPEN FILE\n";
-} else {
-    std::cout << "FILE OPENED SUCCESSFULLY\n";
-}
     *file<<"Step";
     for (int i = 0; i < numberOfArms; i++)
     {
@@ -61,7 +60,7 @@ void ArmsEstematedHistoryTracker::copyHistoryToFile(){
 
 
 void ArmsEstematedHistoryTracker::saveFile(const std::string& filename){
-    this->inisializeFile("./results/"+filename);
+    this->inisializeFile(filename);
     this->copyHistoryToFile();
     file->close();
 }
